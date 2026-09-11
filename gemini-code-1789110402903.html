@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ★ 위키미디어 이미지 차단(엑스박스)을 막아주는 핵심 마법 코드 ★ -->
+<meta name="referrer" content="no-referrer">
+<title>군주론 인물 관계도 (확장판)</title>
+<style>
+    body {
+        font-family: 'Malgun Gothic', sans-serif;
+        background-color: #f4ece1;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+    }
+    h1 {
+        text-align: center;
+        color: #4a3b32;
+    }
+    .timeline-container {
+        display: flex;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 40px auto;
+        position: relative;
+    }
+    .column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 1;
+    }
+    /* 단 너비 조정 */
+    .col-medici { width: 25%; }
+    .col-papacy { width: 35%; }
+    .col-borgia { width: 40%; }
+
+    .column-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #fff;
+        background-color: #5c4a3d;
+        padding: 10px 20px;
+        border-radius: 5px;
+        width: 80%;
+        text-align: center;
+    }
+    .era {
+        width: 100%;
+        text-align: center;
+        margin: 20px 0;
+        font-weight: bold;
+        color: #886d59;
+    }
+    .person-card {
+        background-color: #fff;
+        border: 2px solid #a89483;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        width: 80%;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: transform 0.2s, background-color 0.2s;
+    }
+    .person-card:hover {
+        transform: translateY(-5px);
+        background-color: #faf5f0;
+        border-color: #8a1c1c;
+    }
+    .person-name {
+        font-size: 1.05rem;
+        font-weight: bold;
+        color: #8a1c1c;
+    }
+    .person-dates {
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 5px;
+    }
+    .role {
+        font-size: 0.8rem;
+        color: #0056b3;
+        font-weight: bold;
+        margin-top: 3px;
+    }
+
+    /* 부모 연결 점선 스타일 */
+    .parents-row {
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        position: relative;
+    }
+    .parents-row::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 25%;
+        right: 25%;
+        border-bottom: 3px dashed #8a1c1c;
+        z-index: -1;
+    }
+    .parents-row .person-card {
+        width: 40%;
+        margin-bottom: 0;
+    }
+
+    /* 보르자 남매 2x2 그리드 */
+    .siblings-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        width: 95%;
+    }
+    .siblings-grid .person-card {
+        width: auto;
+        margin-bottom: 0;
+    }
+
+    /* 모달 팝업 스타일 */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7);
+        z-index: 100;
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-content {
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 600px;
+        width: 90%;
+        border-left: 8px solid #8a1c1c;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        display: flex;
+        flex-direction: column;
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    .modal-title {
+        font-size: 1.5rem;
+        color: #8a1c1c;
+        margin: 0;
+    }
+    .modal-close {
+        font-size: 1.8rem;
+        font-weight: bold;
+        cursor: pointer;
+        color: #999;
+        line-height: 1;
+    }
+    .modal-close:hover { color: #333; }
+    .modal-body {
+        display: flex;
+        gap: 20px;
+    }
+    .modal-img-container {
+        flex: 0 0 180px;
+    }
+    .modal-img-container img {
+        width: 100%;
+        border-radius: 5px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+    .modal-text {
+        flex: 1;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+</style>
+</head>
+<body>
+
+<h1>마키아벨리 «군주론» 확장 인물 관계도</h1>
+<p style="text-align:center; color:#666; font-weight:bold;">카드를 클릭하시면 관련 초상화(그림)와 상세 해설을 볼 수 있습니다.</p>
+
+<div class="timeline-container">
+    
+    <!-- 메디치 가문 열 -->
+    <div class="column col-medici">
+        <div class="column-title">메디치 가문 (피렌체)</div>
+        
+        <div class="era">1470s - 1480s</div>
+        <div class="person-card" 
+             data-title="로렌초 데 메디치" 
+             data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Lorenzo_de_Medici.jpg/400px-Lorenzo_de_Medici.jpg"
+             data-desc="일 마니피코(위대한 자). 피렌체의 황금기를 이끈 실질적 지배자입니다. 외교적 균형 감각으로 이탈리아의 평화를 유지했습니다. 마키아벨리는 군주론에서 분열된 이탈리아를 구원할 '비르투(역량)'의 초기 모델 중 하나로 로렌초 시대의 안정된 권력을 염두에 두었습니다.">
+            <div class="person-name">위대한 로렌초</div>
+            <div class="person-dates">(1449-1492)</div>
+        </div>
+        
+        <div class="person-card" 
+             data-title="줄리아노 데 메디치 & 암살 스케치" 
+             data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Leonardo_da_Vinci_-_Bernardo_di_Bandino_Baroncelli.jpg/400px-Leonardo_da_Vinci_-_Bernardo_di_Bandino_Baroncelli.jpg"
+             data-desc="로렌초의 동생. 1478년 '파치 가문의 음모' 당시 미사 도중 칼에 찔려 암살당했습니다. <br><br><b>[사진설명]</b> 훗날 레오나르도 다 빈치가 암살 주동자 중 한 명인 베르나르도 반디니가 교수형 당한 모습을 직접 스케치한 역사적 기록입니다. 이 사건을 겪으며 메디치 가문은 피렌체 내의 권력을 더욱 잔혹하고 확고하게 다지게 됩니다.">
+            <div class="person-name">줄리아노 데 메디치</div>
+            <div class="person-dates">(1453-1478)</div>
+            <div class="role">파치 가문에 암살됨</div>
+        </div>
+
+        <div class="era" style="margin-top:220px;">1510s 이후</div>
+        <div class="person-card" 
+             data-title="로렌초 2세 데 메디치" 
+             data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Raffaello_Sanzio_-_Ritratto_di_Lorenzo_de%27_Medici_duca_di_Urbino_-_Google_Art_Project.jpg/400px-Raffaello_Sanzio_-_Ritratto_di_Lorenzo_de%27_Medici_duca_di_Urbino_-_Google_Art_Project.jpg"
+             data-desc="<b>«군주론»의 헌정 대상자</b>입니다. 위대한 로렌초의 손자이자 교황 레오 10세의 조카로, 우르비노 공작이었습니다. 마키아벨리는 그가 메디치 교황청의 막강한 자금력과 권위를 등에 업고 썩어빠진 이탈리아를 통일하는 '새로운 군주'가 되어주기를 간절히 바랐으나, 역량이 부족했고 젊은 나이에 요절하고 맙니다.">
+            <div class="person-name">로렌초 2세</div>
+            <div class="person-dates">(1492-1519)</div>
+            <div class="role">군주론 헌정 대상</div>
+        </div>
+    </div>
+
+    <!-- 역대 교황 및 보르자 부모 열 -->
+    <div class="column col-papacy">
+        <div class="column-title">로마 교황청 & 막후</div>
+        
+        <div class="era">1490s</div>
+        <div class="parents-row">
+            <div class="person-card" 
+                 data-title="교황 알렉산데르 6세" 
+                 data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Rodrigo_Borgia_1492.jpg/400px-Rodrigo_Borgia_1492.jpg"
+                 data-desc="본명은 로드리고 보르자. 자녀들을 위해 교회의 자금과 권위를 아낌없이 사용한 르네상스 최악의 세속적 교황 중 한 명입니다. 군주론에서 마키아벨리는 그를 <b>'약속을 어기는 데 가장 능숙했던 군주'</b>로 묘사하며, 위선과 기만이라는 여우의 지혜가 현실 정치에서 어떻게 승리하는지 보여준 사례로 극찬(?)했습니다.">
+                <div class="person-name">알렉산데르 6세</div>
+                <div class="person-dates">(재위 1492-1503)</div>
+                <div class="role">교황 / 아버지</div>
+            </div>
+            
+            <div class="person-card" 
+                 data-title="반노차 카타네이" 
+                 data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Vannozza_dei_Cattanei.jpg/400px-Vannozza_dei_Cattanei.jpg"
+                 data-desc="알렉산데르 6세의 오랜 정부(Mistress)이자 후안, 체사레, 루크레치아, 조프레 4남매의 친모입니다. 르네상스 시대 교황이 독신 서약을 어기고 버젓이 가족을 구성하며, 자식들을 통해 세속의 '왕조'를 세우려 했던 부패하고 세속화된 교회의 단면을 명확히 보여주는 막후의 중요 인물입니다.">
+                <div class="person-name">반노차 카타네이</div>
+                <div class="person-dates">(1442-1518)</div>
+                <div class="role">교황의 정부 / 어머니</div>
+            </div>
+        </div>
+
+        <div class="era" style="margin-top:80px;">1500s</div>
+        <div class="person-card" style="width:50%;"
+             data-title="교황 율리오 2세" 
+             data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Raffaello_Sanzio_-_Portrait_of_Julius_II_-_WGA18909.jpg/400px-Raffaello_Sanzio_-_Portrait_of_Julius_II_-_WGA18909.jpg"
+             data-desc="'전사 교황'. 보르자 가문의 철천지 원수입니다. 갑옷을 입고 직접 전쟁터를 누비며 교황령 영토를 확장했습니다. 군주론에서는 그의 앞뒤 안 가리는 무모한 '과감성'이 당시의 시대적 운명(포르투나)과 기적적으로 맞아떨어져 큰 성공을 거두었다고 흥미롭게 분석합니다.">
+            <div class="person-name">율리오 2세</div>
+            <div class="person-dates">(재위 1503-1513)</div>
+        </div>
+
+        <div class="era">1510s - 1520s</div>
+        <div class="person-card" style="width:50%;"
+             data-title="교황 레오 10세" 
+             data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Raffaello_Sanzio_-_Portrait_of_Leo_X_-_WGA18926.jpg/400px-Raffaello_Sanzio_-_Portrait_of_Leo_X_-_WGA18926.jpg"
+             data-desc="메디치 가문의 '위대한 로렌초'의 둘째 아들. 그가 교황이 되면서 쫓겨났던 메디치 가문이 피렌체로 금의환향합니다. 마키아벨리는 군주론 집필 당시, 피렌체와 교황청이 메디치의 손에 통일된 이 기적적인 상황이야말로 외세를 물리칠 유일한 기회라고 호소했습니다.">
+            <div class="person-name">레오 10세</div>
+            <div class="person-dates">(재위 1513-1521)</div>
+        </div>
+    </div>
+
+    <!-- 보르자 자녀들 열 -->
+    <div class="column col-borgia">
+        <div class="column-title">보르자 가문 남매들</div>
+        
+        <div class="era" style="margin-top:10px;">1490s - 1500s<br>(교황의 정치적 장기말들)</div>
+        
+        <div class="siblings-grid">
+            <div class="person-card" 
+                 data-title="후안 보르자" 
+                 data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Juan_Borgia.jpg/400px-Juan_Borgia.jpg"
+                 data-desc="알렉산데르 6세가 가장 아꼈던 아들로, 교황군 총사령관(간디아 공작)이 되었습니다. 그러나 군사적 무능을 노출했고, 1497년 로마 테베레 강에서 칼에 찔린 시체로 발견됩니다. <b>그의 죽음은 성직자였던 동생 체사레가 추기경 옷을 벗어던지고 칼을 쥐게 되는 역사적 분기점</b>이 되었습니다. (체사레의 암살설이 유력합니다)">
+                <div class="person-name">후안 보르자</div>
+                <div class="role">장남 / 군사령관</div>
+            </div>
+            
+            <div class="person-card" 
+                 data-title="체사레 보르자" 
+                 data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Cesare_borgia.jpg/400px-Cesare_borgia.jpg"
+                 data-desc="<b>«군주론» 제7장의 주인공이자 마키아벨리가 묘사한 가장 완벽한 군주 모델.</b> 잔혹한 숙청, 뛰어난 군사전략, 그리고 민심을 다스리는 사자파괴 여우의 술수를 모두 갖췄습니다. 하지만 아버지가 급사하는 시점에 하필 본인마저 죽을 병(말라리아)에 걸려 쓰러지는 '포르투나(운명)'의 거대한 악의를 이기지 못하고 비극적으로 몰락합니다.">
+                <div class="person-name">체사레 보르자</div>
+                <div class="role">차남 / 마키아벨리의 영웅</div>
+            </div>
+
+            <div class="person-card" 
+                 data-title="루크레치아 보르자" 
+                 data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Bartolomeo_Veneto_-_Ritratto_di_Lucrezia_Borgia.jpg/400px-Bartolomeo_Veneto_-_Ritratto_di_Lucrezia_Borgia.jpg"
+                 data-desc="교황의 외교적 무기로 쓰인 비운의 여인. 동맹이 바뀔 때마다 스포르차 가문(강제 이혼), 아라곤 가문(오빠 체사레가 남편 암살), 에스테 가문으로 무려 3번이나 정략결혼을 합니다. 당대의 여성들이 철저히 가문의 정치적 도구로 쓰였음을 보여주며, 훗날 페라라 공작부인으로서 행정 능력을 발휘하기도 했습니다.">
+                <div class="person-name">루크레치아 보르자</div>
+                <div class="role">장녀 / 정략결혼의 희생양</div>
+            </div>
+
+            <div class="person-card" 
+                 data-title="조프레 보르자" 
+                 data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Gioffre_Borgia.jpg/400px-Gioffre_Borgia.jpg"
+                 data-desc="나폴리 왕국과의 동맹을 다지기 위해 12세의 어린 나이에 나폴리의 산차와 정략결혼을 했습니다. 권력욕과 존재감이 넘쳤던 형과 누나에 비해 능력이나 비중은 미미했으나, 역시 알렉산데르 6세가 이탈리아 전체를 장악하기 위해 배치한 퍼즐의 한 조각으로 활용되었습니다.">
+                <div class="person-name">조프레 보르자</div>
+                <div class="role">막내 / 스퀼라체 공작</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 팝업 모달 UI -->
+<div class="modal-overlay" id="infoModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">인물 이름</h2>
+            <span class="modal-close" id="closeModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="modal-img-container">
+                <img id="modalImage" src="" alt="관련 사진">
+            </div>
+            <div class="modal-text" id="modalDesc">
+                군주론 관점의 설명이 여기에 표시됩니다.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const cards = document.querySelectorAll('.person-card');
+    const modal = document.getElementById('infoModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalImage = document.getElementById('modalImage');
+    const closeModal = document.getElementById('closeModal');
+
+    // 카드 클릭 이벤트
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            // 정보 가져오기
+            const title = card.getAttribute('data-title');
+            const desc = card.getAttribute('data-desc');
+            const imgSrc = card.getAttribute('data-img');
+
+            // 모달에 정보 셋팅
+            modalTitle.textContent = title;
+            modalDesc.innerHTML = desc; // HTML 태그(<br>, <b>) 렌더링을 위해 innerHTML 사용
+            
+            if(imgSrc) {
+                modalImage.src = imgSrc;
+                modalImage.style.display = 'block';
+            } else {
+                modalImage.style.display = 'none';
+            }
+
+            // 팝업 열기
+            modal.style.display = 'flex';
+        });
+    });
+
+    // 닫기 버튼
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    // 배경 클릭 시 닫기
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>
